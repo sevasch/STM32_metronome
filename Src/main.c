@@ -54,7 +54,7 @@ char* buff2[100];
 uint8_t tempData[2];
 
 uint16_t LM75Address = 0x90; // I2C address of temperature sensor LM75BD
-uint16_t PCA9685Address = 0x40; // I2C address of PCA9685
+uint16_t PCA9685Address = 0x80; // I2C address of PCA9685
 
 uint16_t tempRegPointer = 0x00; // Address offset of temperature Register
 
@@ -71,7 +71,8 @@ int fputc(int ch, FILE *f) {  ITM_SendChar(ch);  return(ch); }
 /* USER CODE BEGIN 0 */
 
 void pca9685_init(I2C_HandleTypeDef *hi2c, uint8_t address){
-	#definePCA9685_MODE10x00uint8_t initStruct[2];
+	#define PCA9685_MODE1 0x00
+	uint8_t initStruct[2];
 	uint8_t prescale = 3;       // hardcoded
 	HAL_I2C_Master_Transmit(hi2c, address, PCA9685_MODE1, 1, 1);
 	uint8_t oldmode = 0;        // hardcoded
@@ -84,7 +85,7 @@ void pca9685_init(I2C_HandleTypeDef *hi2c, uint8_t address){
 	HAL_I2C_Master_Transmit(hi2c, address, initStruct, 2, 1);
 	initStruct[1] = oldmode;
 	HAL_I2C_Master_Transmit(hi2c, address, initStruct, 2, 1);
-	osDelay(5);
+	HAL_Delay(5);
 	initStruct[1] = (oldmode | 0xA1);
 	HAL_I2C_Master_Transmit(hi2c, address, initStruct, 2, 1);
 }
@@ -127,6 +128,7 @@ int main(void)
 	MX_GPIO_Init();
 	MX_SPI1_Init();
 	MX_I2C1_Init();
+
 	/* USER CODE BEGIN 2 */
 	sendData(0xA5);
 
@@ -136,12 +138,13 @@ int main(void)
 
 	lcd_setLine(127,0,127,31,1);
 	lcd_setString(4,4,"Init",LCD_FONT_8,false);
-	//lcd_setString(4,16,"Line 2",LCD_FONT_8,false);
 	lcd_setLine(0,0,0,31,1);
 	lcd_setString(4,16,"",LCD_FONT_8,false);
-	//lcd_setString(4,4,"LCD TEST",LCD_FONT_8,false);
-	//  lcd_setString(0,0,"BIG ",LCD_FONT_24,false);	$bug no big font
+
 	lcd_show();
+
+	pca9685_init(&hi2c1, PCA9685Address);
+	pca9685_pwm(&hi2c1, PCA9685Address, 15, 0, 4095);
 
 	/* USER CODE END 2 */
 
@@ -151,9 +154,7 @@ int main(void)
 	{
 		volatile float temp = 0.0;
 		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
-		//uint32_t StartTime = HAL_GetTick();
 		HAL_Delay(200);
-//		count++;
 
 // 		// Access register with Master_Receive
 		if(HAL_I2C_Master_Receive(&hi2c1, LM75Address|tempRegPointer, &tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
@@ -161,12 +162,6 @@ int main(void)
 			 Error_Handler();
 		}
 
-// 		// Access register with Mem_Read
-//		if(HAL_I2C_Mem_Read(&hi2c1, LM75Address, tempRegPointer, I2C_MEMADD_SIZE_8BIT,
-//				&tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
-//		{
-//			 Error_Handler();
-//		}
 		//tempData[0] XXXX XXXX and tempData[1] XXX0 0000
 		temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
 		sprintf((char*)buff2,"Temperature = %.3f", temp);
@@ -174,6 +169,14 @@ int main(void)
 
 		lcd_setString(4,4,(const char*)buff2,LCD_FONT_8,false);
 		lcd_show();
+
+		for(int i=0; i<255; i++){
+			pca9685_pwm(&hi2c1, PCA9685Address, 15, 0, 4095-(16*i));
+			HAL_Delay(5);
+		} for(int i=0; i<255; i++){
+			pca9685_pwm(&hi2c1, PCA9685Address, 15, 0, (16*i));
+			HAL_Delay(5);
+		}
 
 	/* USER CODE END WHILE */
 
