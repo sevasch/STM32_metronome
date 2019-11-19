@@ -24,21 +24,21 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-mico_project.elf \
+LCD_Basis.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-mico_project.list \
+LCD_Basis.list \
 
 
 # All Target
-all: mico_project.elf secondary-outputs
+all: LCD_Basis.elf secondary-outputs
 
 # Tool invocations
-mico_project.elf: $(OBJS) $(USER_OBJS) /Users/sebastianschmid/Google\ Drive/Workspace/STM32/mico_project/git/STM32F446RETX_FLASH.ld
-	arm-none-eabi-gcc -o "mico_project.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/sebastianschmid/Google Drive/Workspace/STM32/mico_project/git/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="mico_project.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+LCD_Basis.elf: $(OBJS) $(USER_OBJS) /Users/sebastianschmid/Google\ Drive/Workspace/STM32/lukasgit/LCD_Basis/STM32F446RETX_FLASH.ld
+	arm-none-eabi-gcc -o "LCD_Basis.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/sebastianschmid/Google Drive/Workspace/STM32/lukasgit/LCD_Basis/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="LCD_Basis.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -47,8 +47,8 @@ default.size.stdout: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-mico_project.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "mico_project.list"
+LCD_Basis.list: $(EXECUTABLES)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "LCD_Basis.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
