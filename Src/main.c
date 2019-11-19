@@ -136,15 +136,9 @@ int main(void)
 			 Error_Handler();
 		}
 
-// 		// Access register with Mem_Read
-//		if(HAL_I2C_Mem_Read(&hi2c1, LM75Address, tempRegPointer, I2C_MEMADD_SIZE_8BIT,
-//				&tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
-//		{
-//			 Error_Handler();
-//		}
 		//tempData[0] XXXX XXXX and tempData[1] XXX0 0000
 		temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
-		sprintf((char*)buff2,"Temperature = %f", temp);
+		sprintf((char*)buff2,"Temperature = %.3f", temp);
 
 
 		lcd_setString(4,4,(const char*)buff2,LCD_FONT_8,false);
