@@ -52,7 +52,8 @@
 
 /* USER CODE BEGIN PV */
 char* buff[100];
-char* buff2[100];
+char* temp_buff[100];
+char* analog_buff[100];
 uint8_t tempData[2];
 uint32_t adc_max = 4095; // max analog value
 uint32_t adc_result = 0;
@@ -92,22 +93,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 // timer interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
-	volatile float temp = 0.0;
 
-	// Access register with Master_Receive
-	if(HAL_I2C_Master_Receive(&hi2c1, LM75Address|tempRegPointer, &tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
-	{
-		 Error_Handler();
-	}
 
-	//tempData[0] XXXX XXXX and tempData[1] XXX0 0000
-	temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
-	sprintf((char*)buff2,"Temperature = %.3f", temp);
-
-	lcd_setString(4,4,(const char*)buff2,LCD_FONT_8,false);
-	lcd_show();
-
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
 }
 
 // other functions
@@ -166,9 +153,8 @@ int main(void)
 	MX_SPI1_Init();
 	MX_I2C1_Init();
 	MX_TIM2_Init(100);
-	MX_TIM6_Init();
+//	MX_TIM6_Init();
 	MX_ADC1_Init();
-	MX_ADC2_Init();
 
 	/* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -195,12 +181,32 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
+		beep_and_blink(100, 1000, 0.01);
+
+		// Read and write temperature
+		volatile float temp = 0.0;
+		if(HAL_I2C_Master_Receive(&hi2c1, LM75Address|tempRegPointer, &tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
+		{
+			 Error_Handler();
+		}
+		temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
+		sprintf((char*)temp_buff,"Temperature = %.3f", temp);
+		lcd_setString(4,4,(const char*)temp_buff,LCD_FONT_8,false);
+		lcd_show();
+
+		// analog read
 		HAL_ADC_Start(&hadc1);
 		HAL_ADC_PollForConversion(&hadc1, 50);
 		adc_result = HAL_ADC_GetValue(&hadc1);
 		HAL_ADC_Stop(&hadc1);
 
-		HAL_Delay(1000);
+		char* analog_buff[100];
+		sprintf((char*)analog_buff,"adc_result = %d", adc_result);
+		lcd_setString(4,15,(const char*)analog_buff,LCD_FONT_8,false);
+		lcd_show();
+
+
+		HAL_Delay(5000);
 
 
 
