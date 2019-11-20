@@ -155,6 +155,7 @@ int main(void)
 	MX_TIM2_Init(100);
 //	MX_TIM6_Init();
 	MX_ADC1_Init();
+	MX_ADC2_Init();
 
 	/* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -181,7 +182,7 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		beep_and_blink(100, 1000, 0.01);
+//		beep_and_blink(100, 1000, 0.01);
 
 		// Read and write temperature
 		volatile float temp = 0.0;
@@ -195,10 +196,10 @@ int main(void)
 		lcd_show();
 
 		// analog read
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, 50);
-		adc_result = HAL_ADC_GetValue(&hadc1);
-		HAL_ADC_Stop(&hadc1);
+		HAL_ADC_Start(&hadc2);
+		HAL_ADC_PollForConversion(&hadc2, 50);
+		adc_result = HAL_ADC_GetValue(&hadc2);
+		HAL_ADC_Stop(&hadc2);
 
 		char* analog_buff[100];
 		sprintf((char*)analog_buff,"adc_result = %d", adc_result);
@@ -206,7 +207,7 @@ int main(void)
 		lcd_show();
 
 
-		HAL_Delay(5000);
+		HAL_Delay(100);
 
 
 
