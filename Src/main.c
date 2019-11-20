@@ -20,9 +20,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "i2c.h"
 #include "spi.h"
 #include "gpio.h"
+#include "tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -52,6 +54,8 @@
 char* buff[100];
 char* buff2[100];
 uint8_t tempData[2];
+uint32_t adc_max = 4095; // max analog value
+uint32_t adc_result = 0;
 
 uint16_t LM75Address = 0x90; // I2C address of temperature sensor LM75BD
 
@@ -69,6 +73,66 @@ int fputc(int ch, FILE *f) {  ITM_SendChar(ch);  return(ch); }
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// buttons
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	// down: decrease Duty cycle of current LED
+	if (GPIO_Pin == GPIO_PIN_0) {
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+	}
+
+	// up: increase Duty cycle of current LED
+	if (GPIO_Pin == GPIO_PIN_4) {
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+	}
+	// center
+	if (GPIO_Pin == GPIO_PIN_5) {
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+	}
+}
+
+// timer interrupt
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
+	volatile float temp = 0.0;
+
+	// Access register with Master_Receive
+	if(HAL_I2C_Master_Receive(&hi2c1, LM75Address|tempRegPointer, &tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
+	{
+		 Error_Handler();
+	}
+
+	//tempData[0] XXXX XXXX and tempData[1] XXX0 0000
+	temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
+	sprintf((char*)buff2,"Temperature = %.3f", temp);
+
+	lcd_setString(4,4,(const char*)buff2,LCD_FONT_8,false);
+	lcd_show();
+
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+}
+
+// other functions
+void beep_and_blink(int duration, int pitch, float volume){
+	// calculate prescaler
+	uint32_t clockspeed = 16000000;
+	uint32_t period = __HAL_TIM_GET_AUTORELOAD(&htim2);
+	uint32_t prescaler = clockspeed / (pitch * period);
+
+	// set prescaler
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+	MX_TIM2_Init(prescaler);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, volume * period);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+	HAL_Delay(duration);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 0);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -78,7 +142,6 @@ int fputc(int ch, FILE *f) {  ITM_SendChar(ch);  return(ch); }
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
-	static int32_t count=0;
 	/* USER CODE END 1 */
 
 
@@ -102,7 +165,16 @@ int main(void)
 	MX_GPIO_Init();
 	MX_SPI1_Init();
 	MX_I2C1_Init();
+	MX_TIM2_Init(100);
+	MX_TIM6_Init();
+	MX_ADC1_Init();
+	MX_ADC2_Init();
+
 	/* USER CODE BEGIN 2 */
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+
 	sendData(0xA5);
 
 	// Initialise LCD and show "Welcome" top/left justified
@@ -110,13 +182,12 @@ int main(void)
 	lcd_clear();
 
 	lcd_setLine(127,0,127,31,1);
-	lcd_setString(4,4,"Init",LCD_FONT_8,false);
-	//lcd_setString(4,16,"Line 2",LCD_FONT_8,false);
 	lcd_setLine(0,0,0,31,1);
 	lcd_setString(4,16,"",LCD_FONT_8,false);
-	//lcd_setString(4,4,"LCD TEST",LCD_FONT_8,false);
-	//  lcd_setString(0,0,"BIG ",LCD_FONT_24,false);	$bug no big font
 	lcd_show();
+
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+	HAL_TIM_Base_Start_IT(&htim6);
 
 	/* USER CODE END 2 */
 
@@ -124,25 +195,14 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		volatile float temp = 0.0;
-		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port,LED_BLUE_Pin);
-		//uint32_t StartTime = HAL_GetTick();
-		HAL_Delay(200);
-//		count++;
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, 50);
+		adc_result = HAL_ADC_GetValue(&hadc1);
+		HAL_ADC_Stop(&hadc1);
 
-// 		// Access register with Master_Receive
-		if(HAL_I2C_Master_Receive(&hi2c1, LM75Address|tempRegPointer, &tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
-		{
-			 Error_Handler();
-		}
-
-		//tempData[0] XXXX XXXX and tempData[1] XXX0 0000
-		temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
-		sprintf((char*)buff2,"Temperature = %.3f", temp);
+		HAL_Delay(1000);
 
 
-		lcd_setString(4,4,(const char*)buff2,LCD_FONT_8,false);
-		lcd_show();
 
 	/* USER CODE END WHILE */
 
