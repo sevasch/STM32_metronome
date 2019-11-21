@@ -93,7 +93,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 // timer interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
-
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
 
 }
 
@@ -153,7 +153,7 @@ int main(void)
 	MX_SPI1_Init();
 	MX_I2C1_Init();
 	MX_TIM2_Init(100);
-//	MX_TIM6_Init();
+	MX_TIM6_Init();
 	MX_ADC1_Init();
 	MX_ADC2_Init();
 
