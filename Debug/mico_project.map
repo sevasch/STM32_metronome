@@ -5925,7 +5925,7 @@ OUTPUT(mico_project.elf elf32-littlearm)
  .debug_ranges  0x0000000000000ef8       0x30 Src/tim.o
  .debug_ranges  0x0000000000000f28       0x20 Startup/startup_stm32f446retx.o
 
-.debug_macro    0x0000000000000000    0x22e7b
+.debug_macro    0x0000000000000000    0x22e77
  .debug_macro   0x0000000000000000      0x260 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
  .debug_macro   0x0000000000000260      0xa5a Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
  .debug_macro   0x0000000000000cba      0x19c Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
@@ -5997,9 +5997,9 @@ OUTPUT(mico_project.elf elf32-littlearm)
  .debug_macro   0x000000000002266f      0x1ae Src/sysmem.o
  .debug_macro   0x000000000002281d      0x23b Src/sysmem.o
  .debug_macro   0x0000000000022a58      0x206 Src/system_stm32f4xx.o
- .debug_macro   0x0000000000022c5e      0x21d Src/tim.o
+ .debug_macro   0x0000000000022c5e      0x219 Src/tim.o
 
-.debug_line     0x0000000000000000     0xe950
+.debug_line     0x0000000000000000     0xe937
  .debug_line    0x0000000000000000      0x94f Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
  .debug_line    0x000000000000094f      0xbb9 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
  .debug_line    0x0000000000001508      0xa76 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
@@ -6020,8 +6020,8 @@ OUTPUT(mico_project.elf elf32-littlearm)
  .debug_line    0x000000000000cc03      0x7ec Src/stm32f4xx_it.o
  .debug_line    0x000000000000d3ef      0x595 Src/sysmem.o
  .debug_line    0x000000000000d984      0x769 Src/system_stm32f4xx.o
- .debug_line    0x000000000000e0ed      0x7e2 Src/tim.o
- .debug_line    0x000000000000e8cf       0x81 Startup/startup_stm32f446retx.o
+ .debug_line    0x000000000000e0ed      0x7c9 Src/tim.o
+ .debug_line    0x000000000000e8b6       0x81 Startup/startup_stm32f446retx.o
 
 .debug_str      0x0000000000000000    0xd5d85
  .debug_str     0x0000000000000000    0xccfd7 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
