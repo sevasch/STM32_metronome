@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
+#include "time.h"
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
