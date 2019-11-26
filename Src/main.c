@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f4xx_hal.h"
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
@@ -94,7 +95,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 // timer interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
 	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
-
 }
 
 // other functions
@@ -162,18 +162,18 @@ int main(void)
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 
-	sendData(0xA5);
-
 	// Initialise LCD and show "Welcome" top/left justified
+	sendData(0xA5);
 	lcd_init();
 	lcd_clear();
-
 	lcd_setLine(127,0,127,31,1);
 	lcd_setLine(0,0,0,31,1);
 	lcd_setString(4,16,"",LCD_FONT_8,false);
 	lcd_show();
 
+	// start PWM and timer interrupt
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+
 	HAL_TIM_Base_Start_IT(&htim6);
 
 	/* USER CODE END 2 */
