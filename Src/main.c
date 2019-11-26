@@ -52,12 +52,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char* buff[100];
-char* temp_buff[100];
-char* analog_buff[100];
-uint8_t tempData[2];
-uint32_t adc_max = 4095; // max analog value
-uint32_t adc_result = 0;
+char* text_buff[100];
+const uint32_t ADC_MAX = 4095; // max analog value
+uint32_t pot1_raw = 0;
 
 uint16_t LM75Address = 0x90; // I2C address of temperature sensor LM75BD
 
@@ -95,6 +92,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 // timer interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
 	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+
+	// analog read both potentiometers
+	HAL_ADC_Start(&hadc2);
+	HAL_ADC_PollForConversion(&hadc2, 50);
+	pot1_raw = HAL_ADC_GetValue(&hadc2);
+	HAL_ADC_Stop(&hadc2);
+
+	char* text_buff[100];
+	sprintf((char*)text_buff,"pot1_raw = %d", pot1_raw);
+	lcd_setString(4,15,(const char*)text_buff,LCD_FONT_8,false);
+	lcd_show();
 }
 
 // other functions
@@ -184,27 +192,12 @@ int main(void)
 	{
 //		beep_and_blink(100, 1000, 0.01);
 
-		// Read and write temperature
-		volatile float temp = 0.0;
-		if(HAL_I2C_Master_Receive(&hi2c1, LM75Address|tempRegPointer, &tempData[0], 2,HAL_MAX_DELAY)!= HAL_OK)
-		{
-			 Error_Handler();
-		}
-		temp = 0.125*(tempData[0]*8.0 + (tempData[1]>>5));
-		sprintf((char*)temp_buff,"Temperature = %.3f", temp);
-		lcd_setString(4,4,(const char*)temp_buff,LCD_FONT_8,false);
-		lcd_show();
 
-		// analog read
-		HAL_ADC_Start(&hadc2);
-		HAL_ADC_PollForConversion(&hadc2, 50);
-		adc_result = HAL_ADC_GetValue(&hadc2);
-		HAL_ADC_Stop(&hadc2);
+//		sprintf((char*)temp_buff,"Temperature = %.3f", temp);
+//		lcd_setString(4,4,(const char*)temp_buff,LCD_FONT_8,false);
+//		lcd_show();
 
-		char* analog_buff[100];
-		sprintf((char*)analog_buff,"adc_result = %d", adc_result);
-		lcd_setString(4,15,(const char*)analog_buff,LCD_FONT_8,false);
-		lcd_show();
+
 
 
 		HAL_Delay(100);
