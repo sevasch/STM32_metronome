@@ -52,9 +52,27 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char* text_buff[100];
+// metronome specific
+int bpm = 0;
+const int MIN_BPM = 40;
+const int MAX_BPM = 200;
+int vol = 0;
+const int MAX_VOL = 100;
+
+typedef enum {
+	STANDARD,
+	PRONCOUNCED
+} mode;
+mode op_mode;
+
+int counter = 0;
+int beats_per_rythm = 0;
+
+
+// adc
 const uint32_t ADC_MAX = 4095; // max analog value
 uint32_t pot1_raw = 0;
+uint32_t pot2_raw = 0;
 
 uint16_t LM75Address = 0x90; // I2C address of temperature sensor LM75BD
 
@@ -91,18 +109,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 // timer interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+	update_volume();
+	update_bpm();
 
-	// analog read both potentiometers
-	HAL_ADC_Start(&hadc2);
-	HAL_ADC_PollForConversion(&hadc2, 50);
-	pot1_raw = HAL_ADC_GetValue(&hadc2);
-	HAL_ADC_Stop(&hadc2);
-
-	char* text_buff[100];
-	sprintf((char*)text_buff,"pot1_raw = %d", pot1_raw);
-	lcd_setString(4,15,(const char*)text_buff,LCD_FONT_8,false);
-	lcd_show();
 }
 
 // other functions
@@ -112,12 +121,16 @@ void beep_and_blink(int duration, int pitch, float volume){
 	uint32_t period = __HAL_TIM_GET_AUTORELOAD(&htim2);
 	uint32_t prescaler = clockspeed / (pitch * period);
 
+	// calculate duty cycle
+	uint32_t dc = 0;
+	dc = 0.01 + volume/MAX_VOL * 0.8 * period;
+
 	// set prescaler
 	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
 	MX_TIM2_Init(prescaler);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
 
-	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, volume * period);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, dc);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
@@ -127,6 +140,52 @@ void beep_and_blink(int duration, int pitch, float volume){
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 }
+
+
+
+void update_volume(){
+	// read analog signal
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 50);
+	pot1_raw = HAL_ADC_GetValue(&hadc1);
+	HAL_ADC_Stop(&hadc1);
+
+	// update value
+	vol = pot1_raw/ADC_MAX * MAX_VOL;
+
+
+}
+
+void update_bpm(){
+	// read analog signal
+	HAL_ADC_Start(&hadc2);
+	HAL_ADC_PollForConversion(&hadc2, 50);
+	pot2_raw = HAL_ADC_GetValue(&hadc2);
+	HAL_ADC_Stop(&hadc2);
+
+	// update value
+	bpm = MIN_BPM + pot2_raw/ADC_MAX * (MAX_BPM - MIN_BPM);
+}
+
+void update_display(){
+	// display value
+	char* text1_buff[100];
+	sprintf((char*)text1_buff,"vol %d", vol);
+	lcd_setString(4,4,(const char*)text1_buff,LCD_FONT_8,false);
+	lcd_show();
+
+	// display value
+	char* text2_buff[100];
+	sprintf((char*)text2_buff,"bpm = %d", bpm);
+	lcd_setString(4,15,(const char*)text2_buff,LCD_FONT_8,false);
+	lcd_show();
+
+}
+
+void state_machine(){
+
+}
+
 
 /* USER CODE END 0 */
 
@@ -191,14 +250,6 @@ int main(void)
 	while (1)
 	{
 //		beep_and_blink(100, 1000, 0.01);
-
-
-//		sprintf((char*)temp_buff,"Temperature = %.3f", temp);
-//		lcd_setString(4,4,(const char*)temp_buff,LCD_FONT_8,false);
-//		lcd_show();
-
-
-
 
 		HAL_Delay(100);
 
