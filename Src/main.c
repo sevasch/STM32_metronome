@@ -55,7 +55,7 @@
 // metronome specific
 typedef enum {
 	STANDARD,
-	PRONCOUNCED
+	PRONOUNCED
 } mode;
 mode op_mode;
 
@@ -126,7 +126,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
 	update_volume();
 	update_bpm();
 	update_display();
-
+//	beat_machine();
 }
 
 // other functions
@@ -200,7 +200,7 @@ void update_display(){
 	// display mode
 	if (op_mode == STANDARD){
 		sprintf((char*)mode_tbuff,"STANDARD MODE");
-	}else if(op_mode == PRONCOUNCED){
+	}else if(op_mode == PRONOUNCED){
 		sprintf((char*)mode_tbuff,"PRONOUNCED MODE");
 	}
 	lcd_setString(50,4,(const char*)mode_tbuff, LCD_FONT_8,false);
@@ -225,7 +225,7 @@ void update_display(){
 void beat_machine(){
 	if (op_mode == STANDARD){
 		standard_beatroutine();
-	}else if(op_mode == PRONCOUNCED){
+	}else if(op_mode == PRONOUNCED){
 		offbeat_beatroutine();
 	}
 }
@@ -245,11 +245,11 @@ void standard_beatroutine(){
 void offbeat_beatroutine(){
 	int beep_time = 50;
 	if (beat < beats_per_rythm){
-		beep_and_blink(beep_time, 1000, vol);
 		beat += 1;
+		beep_and_blink(beep_time, 1000, vol);
 	}else{
-		beep_and_blink(beep_time, 2000, vol);
 		beat = 1;
+		beep_and_blink(beep_time, 2000, vol);
 	}
 	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
 }
@@ -313,8 +313,6 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-//		beep_and_blink(100, 1000, 0.01);
-
 		beat_machine();
 
 

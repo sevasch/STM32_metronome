@@ -5850,7 +5850,7 @@ LOAD /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.id
                 0x0000000000000beb       0x22 /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.macos64_1.0.0.201904181610/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
 OUTPUT(mico_project.elf elf32-littlearm)
 
-.debug_info     0x0000000000000000    0x12d1e
+.debug_info     0x0000000000000000    0x12d34
  .debug_info    0x0000000000000000      0x973 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
  .debug_info    0x0000000000000973      0xc9c Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
  .debug_info    0x000000000000160f      0xdf4 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
@@ -5865,14 +5865,14 @@ OUTPUT(mico_project.elf elf32-littlearm)
  .debug_info    0x000000000000b6c0      0x6d0 Src/gpio.o
  .debug_info    0x000000000000bd90      0x9cc Src/i2c.o
  .debug_info    0x000000000000c75c     0x167b Src/lcd_driver.o
- .debug_info    0x000000000000ddd7     0x1fe9 Src/main.o
- .debug_info    0x000000000000fdc0      0x999 Src/spi.o
- .debug_info    0x0000000000010759      0x344 Src/stm32f4xx_hal_msp.o
- .debug_info    0x0000000000010a9d      0x699 Src/stm32f4xx_it.o
- .debug_info    0x0000000000011136      0x91c Src/sysmem.o
- .debug_info    0x0000000000011a52      0x536 Src/system_stm32f4xx.o
- .debug_info    0x0000000000011f88      0xd74 Src/tim.o
- .debug_info    0x0000000000012cfc       0x22 Startup/startup_stm32f446retx.o
+ .debug_info    0x000000000000ddd7     0x1ff4 Src/main.o
+ .debug_info    0x000000000000fdcb      0x999 Src/spi.o
+ .debug_info    0x0000000000010764      0x344 Src/stm32f4xx_hal_msp.o
+ .debug_info    0x0000000000010aa8      0x699 Src/stm32f4xx_it.o
+ .debug_info    0x0000000000011141      0x91c Src/sysmem.o
+ .debug_info    0x0000000000011a5d      0x536 Src/system_stm32f4xx.o
+ .debug_info    0x0000000000011f93      0xd7f Src/tim.o
+ .debug_info    0x0000000000012d12       0x22 Startup/startup_stm32f446retx.o
 
 .debug_abbrev   0x0000000000000000     0x2864
  .debug_abbrev  0x0000000000000000      0x1cb Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
@@ -6050,7 +6050,7 @@ OUTPUT(mico_project.elf elf32-littlearm)
  .debug_macro   0x0000000000022c20      0x206 Src/system_stm32f4xx.o
  .debug_macro   0x0000000000022e26      0x219 Src/tim.o
 
-.debug_line     0x0000000000000000     0xea1c
+.debug_line     0x0000000000000000     0xea1a
  .debug_line    0x0000000000000000      0x94f Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
  .debug_line    0x000000000000094f      0xbb9 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
  .debug_line    0x0000000000001508      0xa76 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
@@ -6065,16 +6065,16 @@ OUTPUT(mico_project.elf elf32-littlearm)
  .debug_line    0x0000000000009865      0x775 Src/gpio.o
  .debug_line    0x0000000000009fda      0x779 Src/i2c.o
  .debug_line    0x000000000000a753      0xb9e Src/lcd_driver.o
- .debug_line    0x000000000000b2f1      0xb21 Src/main.o
- .debug_line    0x000000000000be12      0x77c Src/spi.o
- .debug_line    0x000000000000c58e      0x748 Src/stm32f4xx_hal_msp.o
- .debug_line    0x000000000000ccd6      0x7fe Src/stm32f4xx_it.o
- .debug_line    0x000000000000d4d4      0x595 Src/sysmem.o
- .debug_line    0x000000000000da69      0x769 Src/system_stm32f4xx.o
- .debug_line    0x000000000000e1d2      0x7c9 Src/tim.o
- .debug_line    0x000000000000e99b       0x81 Startup/startup_stm32f446retx.o
+ .debug_line    0x000000000000b2f1      0xb1f Src/main.o
+ .debug_line    0x000000000000be10      0x77c Src/spi.o
+ .debug_line    0x000000000000c58c      0x748 Src/stm32f4xx_hal_msp.o
+ .debug_line    0x000000000000ccd4      0x7fe Src/stm32f4xx_it.o
+ .debug_line    0x000000000000d4d2      0x595 Src/sysmem.o
+ .debug_line    0x000000000000da67      0x769 Src/system_stm32f4xx.o
+ .debug_line    0x000000000000e1d0      0x7c9 Src/tim.o
+ .debug_line    0x000000000000e999       0x81 Startup/startup_stm32f446retx.o
 
-.debug_str      0x0000000000000000    0xd5f59
+.debug_str      0x0000000000000000    0xd5f5e
  .debug_str     0x0000000000000000    0xccfd7 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
                                       0xcd382 (size before relaxing)
  .debug_str     0x00000000000ccfd7      0x665 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
@@ -6103,21 +6103,21 @@ OUTPUT(mico_project.elf elf32-littlearm)
                                       0xcceaf (size before relaxing)
  .debug_str     0x00000000000d0d50     0x369a Src/lcd_driver.o
                                       0xd0375 (size before relaxing)
- .debug_str     0x00000000000d43ea     0x14c2 Src/main.o
-                                      0xd1967 (size before relaxing)
- .debug_str     0x00000000000d58ac       0x24 Src/spi.o
+ .debug_str     0x00000000000d43ea     0x14c7 Src/main.o
+                                      0xd196c (size before relaxing)
+ .debug_str     0x00000000000d58b1       0x24 Src/spi.o
                                       0xccdf3 (size before relaxing)
- .debug_str     0x00000000000d58d0       0x1b Src/stm32f4xx_hal_msp.o
+ .debug_str     0x00000000000d58d5       0x1b Src/stm32f4xx_hal_msp.o
                                       0xcc8fb (size before relaxing)
- .debug_str     0x00000000000d58eb       0xcc Src/stm32f4xx_it.o
+ .debug_str     0x00000000000d58f0       0xcc Src/stm32f4xx_it.o
                                       0xccc9d (size before relaxing)
- .debug_str     0x00000000000d59b7      0x4b9 Src/sysmem.o
+ .debug_str     0x00000000000d59bc      0x4b9 Src/sysmem.o
                                        0x7b00 (size before relaxing)
- .debug_str     0x00000000000d5e70       0x5a Src/system_stm32f4xx.o
+ .debug_str     0x00000000000d5e75       0x5a Src/system_stm32f4xx.o
                                       0xcc7fb (size before relaxing)
- .debug_str     0x00000000000d5eca       0x5e Src/tim.o
-                                      0xcd471 (size before relaxing)
- .debug_str     0x00000000000d5f28       0x31 Startup/startup_stm32f446retx.o
+ .debug_str     0x00000000000d5ecf       0x5e Src/tim.o
+                                      0xcd477 (size before relaxing)
+ .debug_str     0x00000000000d5f2d       0x31 Startup/startup_stm32f446retx.o
                                          0x82 (size before relaxing)
 
 .comment        0x0000000000000000       0x7b

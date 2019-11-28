@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000201f4  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00012d1e  00000000  00000000  00020224  2**0
+ 12 .debug_info   00012d34  00000000  00000000  00020224  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 00002864  00000000  00000000  00032f42  2**0
+ 13 .debug_abbrev 00002864  00000000  00000000  00032f58  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 000010b8  00000000  00000000  000357a8  2**3
+ 14 .debug_aranges 000010b8  00000000  00000000  000357c0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 00000f80  00000000  00000000  00036860  2**3
+ 15 .debug_ranges 00000f80  00000000  00000000  00036878  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_macro  0002303f  00000000  00000000  000377e0  2**0
+ 16 .debug_macro  0002303f  00000000  00000000  000377f8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   0000ea1c  00000000  00000000  0005a81f  2**0
+ 17 .debug_line   0000ea1a  00000000  00000000  0005a837  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    000d5f59  00000000  00000000  0006923b  2**0
+ 18 .debug_str    000d5f5e  00000000  00000000  00069251  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  0013f194  2**0
+ 19 .comment      0000007b  00000000  00000000  0013f1af  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00004fcc  00000000  00000000  0013f210  2**2
+ 20 .debug_frame  00004fcc  00000000  00000000  0013f22c  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -10749,7 +10749,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
  8004710:	f000 f8ca 	bl	80048a8 <update_bpm>
 	update_display();
  8004714:	f000 f90e 	bl	8004934 <update_display>
-
+//	beat_machine();
 }
  8004718:	bf00      	nop
  800471a:	3708      	adds	r7, #8
@@ -11093,7 +11093,7 @@ void update_display(){
  80049ca:	c407      	stmia	r4!, {r0, r1, r2}
  80049cc:	8023      	strh	r3, [r4, #0]
  80049ce:	e009      	b.n	80049e4 <update_display+0xb0>
-	}else if(op_mode == PRONCOUNCED){
+	}else if(op_mode == PRONOUNCED){
  80049d0:	4b46      	ldr	r3, [pc, #280]	; (8004aec <update_display+0x1b8>)
  80049d2:	781b      	ldrb	r3, [r3, #0]
  80049d4:	2b01      	cmp	r3, #1
@@ -11241,12 +11241,12 @@ void beat_machine(){
  8004b16:	d102      	bne.n	8004b1e <beat_machine+0x12>
 		standard_beatroutine();
  8004b18:	f000 f80c 	bl	8004b34 <standard_beatroutine>
-	}else if(op_mode == PRONCOUNCED){
+	}else if(op_mode == PRONOUNCED){
 		offbeat_beatroutine();
 	}
 }
  8004b1c:	e005      	b.n	8004b2a <beat_machine+0x1e>
-	}else if(op_mode == PRONCOUNCED){
+	}else if(op_mode == PRONOUNCED){
  8004b1e:	4b04      	ldr	r3, [pc, #16]	; (8004b30 <beat_machine+0x24>)
  8004b20:	781b      	ldrb	r3, [r3, #0]
  8004b22:	2b01      	cmp	r3, #1
@@ -11350,36 +11350,36 @@ void offbeat_beatroutine(){
  8004bf0:	681b      	ldr	r3, [r3, #0]
  8004bf2:	429a      	cmp	r2, r3
  8004bf4:	da12      	bge.n	8004c1c <offbeat_beatroutine+0x3c>
-		beep_and_blink(beep_time, 1000, vol);
- 8004bf6:	4b21      	ldr	r3, [pc, #132]	; (8004c7c <offbeat_beatroutine+0x9c>)
- 8004bf8:	681b      	ldr	r3, [r3, #0]
- 8004bfa:	ee07 3a90 	vmov	s15, r3
- 8004bfe:	eef8 7ae7 	vcvt.f32.s32	s15, s15
- 8004c02:	eeb0 0a67 	vmov.f32	s0, s15
- 8004c06:	f44f 717a 	mov.w	r1, #1000	; 0x3e8
- 8004c0a:	6878      	ldr	r0, [r7, #4]
- 8004c0c:	f7ff fd88 	bl	8004720 <beep_and_blink>
 		beat += 1;
- 8004c10:	4b18      	ldr	r3, [pc, #96]	; (8004c74 <offbeat_beatroutine+0x94>)
- 8004c12:	681b      	ldr	r3, [r3, #0]
- 8004c14:	3301      	adds	r3, #1
- 8004c16:	4a17      	ldr	r2, [pc, #92]	; (8004c74 <offbeat_beatroutine+0x94>)
- 8004c18:	6013      	str	r3, [r2, #0]
+ 8004bf6:	4b1f      	ldr	r3, [pc, #124]	; (8004c74 <offbeat_beatroutine+0x94>)
+ 8004bf8:	681b      	ldr	r3, [r3, #0]
+ 8004bfa:	3301      	adds	r3, #1
+ 8004bfc:	4a1d      	ldr	r2, [pc, #116]	; (8004c74 <offbeat_beatroutine+0x94>)
+ 8004bfe:	6013      	str	r3, [r2, #0]
+		beep_and_blink(beep_time, 1000, vol);
+ 8004c00:	4b1e      	ldr	r3, [pc, #120]	; (8004c7c <offbeat_beatroutine+0x9c>)
+ 8004c02:	681b      	ldr	r3, [r3, #0]
+ 8004c04:	ee07 3a90 	vmov	s15, r3
+ 8004c08:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ 8004c0c:	eeb0 0a67 	vmov.f32	s0, s15
+ 8004c10:	f44f 717a 	mov.w	r1, #1000	; 0x3e8
+ 8004c14:	6878      	ldr	r0, [r7, #4]
+ 8004c16:	f7ff fd83 	bl	8004720 <beep_and_blink>
  8004c1a:	e00f      	b.n	8004c3c <offbeat_beatroutine+0x5c>
 	}else{
-		beep_and_blink(beep_time, 2000, vol);
- 8004c1c:	4b17      	ldr	r3, [pc, #92]	; (8004c7c <offbeat_beatroutine+0x9c>)
- 8004c1e:	681b      	ldr	r3, [r3, #0]
- 8004c20:	ee07 3a90 	vmov	s15, r3
- 8004c24:	eef8 7ae7 	vcvt.f32.s32	s15, s15
- 8004c28:	eeb0 0a67 	vmov.f32	s0, s15
- 8004c2c:	f44f 61fa 	mov.w	r1, #2000	; 0x7d0
- 8004c30:	6878      	ldr	r0, [r7, #4]
- 8004c32:	f7ff fd75 	bl	8004720 <beep_and_blink>
 		beat = 1;
- 8004c36:	4b0f      	ldr	r3, [pc, #60]	; (8004c74 <offbeat_beatroutine+0x94>)
- 8004c38:	2201      	movs	r2, #1
- 8004c3a:	601a      	str	r2, [r3, #0]
+ 8004c1c:	4b15      	ldr	r3, [pc, #84]	; (8004c74 <offbeat_beatroutine+0x94>)
+ 8004c1e:	2201      	movs	r2, #1
+ 8004c20:	601a      	str	r2, [r3, #0]
+		beep_and_blink(beep_time, 2000, vol);
+ 8004c22:	4b16      	ldr	r3, [pc, #88]	; (8004c7c <offbeat_beatroutine+0x9c>)
+ 8004c24:	681b      	ldr	r3, [r3, #0]
+ 8004c26:	ee07 3a90 	vmov	s15, r3
+ 8004c2a:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ 8004c2e:	eeb0 0a67 	vmov.f32	s0, s15
+ 8004c32:	f44f 61fa 	mov.w	r1, #2000	; 0x7d0
+ 8004c36:	6878      	ldr	r0, [r7, #4]
+ 8004c38:	f7ff fd72 	bl	8004720 <beep_and_blink>
 	}
 	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
  8004c3c:	4b10      	ldr	r3, [pc, #64]	; (8004c80 <offbeat_beatroutine+0xa0>)
@@ -11487,11 +11487,11 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim6);
  8004ce8:	4806      	ldr	r0, [pc, #24]	; (8004d04 <main+0x78>)
  8004cea:	f7fe f8b0 	bl	8002e4e <HAL_TIM_Base_Start_IT>
+
+	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-//		beep_and_blink(100, 1000, 0.01);
-
 		beat_machine();
  8004cee:	f7ff ff0d 	bl	8004b0c <beat_machine>
  8004cf2:	e7fc      	b.n	8004cee <main+0x62>
