@@ -181,14 +181,21 @@ void update_bpm(){
 }
 
 void update_display(){
-	// display volume
 	lcd_clear();
+
+	// add some lines
+	lcd_setLine(0,0,0,31,1);
+	lcd_setLine(48,0,48,31,1);
+	lcd_setLine(127,0,127,31,1);
+	lcd_setLine(0,15,127,15,1);
+
+	// display volume
 	sprintf((char*)vol_tbuff,"vol %d", vol);
 	lcd_setString(4,4,(const char*)vol_tbuff,LCD_FONT_8,false);
 
 	// display bpm
-	sprintf((char*)bpm_tbuff,"bpm %d", bpm);
-	lcd_setString(4,15,(const char*)bpm_tbuff, LCD_FONT_8,false);
+	sprintf((char*)bpm_tbuff,"%d bpm", bpm);
+	lcd_setString(4,20,(const char*)bpm_tbuff, LCD_FONT_8,false);
 
 	// display mode
 	if (op_mode == STANDARD){
@@ -198,14 +205,18 @@ void update_display(){
 	}
 	lcd_setString(50,4,(const char*)mode_tbuff, LCD_FONT_8,false);
 
-	// display beat
-	int min_dist = 50;
-	int max_dist = 120;
+	// display beats
+	int min_dist = 55;
+	int max_dist = 140;
 	int pos = 0;
 	for (int b = 0; b < beats_per_rythm; ++b){
 		pos = min_dist + (float)b / (float)beats_per_rythm * (max_dist - min_dist);
-		lcd_setString(pos, 15, "o", LCD_FONT_8,false);
+		lcd_setString(pos, 18, "o", LCD_FONT_8,false);
 	}
+
+	// display beat indicator
+	pos = min_dist + (float)(beat-1) / (float)beats_per_rythm * (max_dist - min_dist);
+	lcd_setString(pos, 25, "*", LCD_FONT_8,false);
 
 	lcd_show();
 
@@ -289,11 +300,7 @@ int main(void)
 	// Initialise LCD and show "Welcome" top/left justified
 	sendData(0xA5);
 	lcd_init();
-	lcd_clear();
-	lcd_setLine(127,0,127,31,1);
-	lcd_setLine(0,0,0,31,1);
-	lcd_setString(4,16,"",LCD_FONT_8,false);
-	lcd_show();
+
 
 	// start PWM and timer interrupt
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
