@@ -53,17 +53,22 @@
 
 /* USER CODE BEGIN PV */
 // metronome specific
-int bpm = 50;
-int MIN_BPM = 40;
-int MAX_BPM = 200;
-int vol = 0;
-int MAX_VOL = 100;
-
 typedef enum {
 	STANDARD,
 	PRONCOUNCED
 } mode;
 mode op_mode;
+
+int bpm = 50;
+int MIN_BPM = 40;
+int MAX_BPM = 200;
+int vol = 0;
+int MAX_VOL = 100;
+char* vol_tbuff[100];
+char* bpm_tbuff[100];
+char* mode_tbuff[100];
+
+
 
 int beat = 1;
 int beats_per_rythm = 4;
@@ -95,8 +100,9 @@ void update_bpm();
 void update_display();
 void beep_and_blink(int duration, int pitch, float volume);
 void pseudoblink(int duration, int pitch, float volume);
-void state_machine();
-void st_routine();
+void beat_machine();
+void standard_beatroutine();
+void offbeat_beatroutine();
 
 // buttons
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -175,24 +181,57 @@ void update_bpm(){
 }
 
 void update_display(){
-	// display value
-	char* text1_buff[100];
-	sprintf((char*)text1_buff,"vol %d", vol);
-	lcd_setString(4,4,(const char*)text1_buff,LCD_FONT_8,false);
+	// display volume
+	lcd_clear();
+	sprintf((char*)vol_tbuff,"vol %d", vol);
+	lcd_setString(4,4,(const char*)vol_tbuff,LCD_FONT_8,false);
 
-	// display value
-	char* text2_buff[100];
-	sprintf((char*)text2_buff,"bpm %d", bpm);
-	lcd_setString(4,15,(const char*)text2_buff,LCD_FONT_8,false);
+	// display bpm
+	sprintf((char*)bpm_tbuff,"bpm %d", bpm);
+	lcd_setString(4,15,(const char*)bpm_tbuff, LCD_FONT_8,false);
+
+	// display mode
+	if (op_mode == STANDARD){
+		sprintf((char*)mode_tbuff,"STANDARD MODE");
+	}else if(op_mode == PRONCOUNCED){
+		sprintf((char*)mode_tbuff,"PRONOUNCED MODE");
+	}
+	lcd_setString(50,4,(const char*)mode_tbuff, LCD_FONT_8,false);
+
+	// display beat
+	int min_dist = 50;
+	int max_dist = 120;
+	int pos = 0;
+	for (int b = 0; b < beats_per_rythm; ++b){
+		pos = min_dist + (float)b / (float)beats_per_rythm * (max_dist - min_dist);
+		lcd_setString(pos, 15, "o", LCD_FONT_8,false);
+	}
+
 	lcd_show();
 
 }
 
-void state_machine(){
-
+void beat_machine(){
+	if (op_mode == STANDARD){
+		standard_beatroutine();
+	}else if(op_mode == PRONCOUNCED){
+		offbeat_beatroutine();
+	}
 }
 
-void offbeat_routine(){
+void standard_beatroutine(){
+	int beep_time = 50;
+	if (beat < beats_per_rythm){
+		beep_and_blink(beep_time, 1000, vol);
+		beat += 1;
+	}else{
+		beep_and_blink(beep_time, 1000, vol);
+		beat = 1;
+	}
+	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
+}
+
+void offbeat_beatroutine(){
 	int beep_time = 50;
 	if (beat < beats_per_rythm){
 		beep_and_blink(beep_time, 1000, vol);
@@ -202,15 +241,7 @@ void offbeat_routine(){
 		beat = 1;
 	}
 	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
-
-	// display value
-//	char* text3_buff[100];
-//	sprintf((char*)text3_buff,"%d %d", beat, beats_per_rythm);
-//	lcd_setString(50,4,(const char*)beat,LCD_FONT_8,false);
-//	lcd_show();
 }
-
-
 
 
 /* USER CODE END 0 */
@@ -277,7 +308,7 @@ int main(void)
 	{
 //		beep_and_blink(100, 1000, 0.01);
 
-		offbeat_routine();
+		beat_machine();
 
 
 	/* USER CODE END WHILE */
