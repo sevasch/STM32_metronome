@@ -53,11 +53,11 @@
 
 /* USER CODE BEGIN PV */
 // metronome specific
-int bpm = 0;
-const int MIN_BPM = 40;
-const int MAX_BPM = 200;
+int bpm = 50;
+int MIN_BPM = 40;
+int MAX_BPM = 200;
 int vol = 0;
-const int MAX_VOL = 100;
+int MAX_VOL = 100;
 
 typedef enum {
 	STANDARD,
@@ -65,8 +65,8 @@ typedef enum {
 } mode;
 mode op_mode;
 
-int counter = 0;
-int beats_per_rythm = 0;
+int beat = 1;
+int beats_per_rythm = 4;
 
 
 // adc
@@ -90,6 +90,14 @@ int fputc(int ch, FILE *f) {  ITM_SendChar(ch);  return(ch); }
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void update_volume();
+void update_bpm();
+void update_display();
+void beep_and_blink(int duration, int pitch, float volume);
+void pseudoblink(int duration, int pitch, float volume);
+void state_machine();
+void st_routine();
+
 // buttons
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	// down: decrease Duty cycle of current LED
@@ -111,6 +119,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
 	update_volume();
 	update_bpm();
+	update_display();
 
 }
 
@@ -123,7 +132,7 @@ void beep_and_blink(int duration, int pitch, float volume){
 
 	// calculate duty cycle
 	uint32_t dc = 0;
-	dc = 0.01 + volume/MAX_VOL * 0.8 * period;
+	dc = ((float)volume/(float)MAX_VOL * 0.1) * period;
 
 	// set prescaler
 	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
@@ -142,7 +151,6 @@ void beep_and_blink(int duration, int pitch, float volume){
 }
 
 
-
 void update_volume(){
 	// read analog signal
 	HAL_ADC_Start(&hadc1);
@@ -151,8 +159,7 @@ void update_volume(){
 	HAL_ADC_Stop(&hadc1);
 
 	// update value
-	vol = pot1_raw/ADC_MAX * MAX_VOL;
-
+	vol = ((float)pot1_raw/(float)ADC_MAX) * (float)MAX_VOL;
 
 }
 
@@ -164,7 +171,7 @@ void update_bpm(){
 	HAL_ADC_Stop(&hadc2);
 
 	// update value
-	bpm = MIN_BPM + pot2_raw/ADC_MAX * (MAX_BPM - MIN_BPM);
+	bpm = MIN_BPM + (float)pot2_raw/(float)ADC_MAX * (float)(MAX_BPM - MIN_BPM);
 }
 
 void update_display(){
@@ -172,11 +179,10 @@ void update_display(){
 	char* text1_buff[100];
 	sprintf((char*)text1_buff,"vol %d", vol);
 	lcd_setString(4,4,(const char*)text1_buff,LCD_FONT_8,false);
-	lcd_show();
 
 	// display value
 	char* text2_buff[100];
-	sprintf((char*)text2_buff,"bpm = %d", bpm);
+	sprintf((char*)text2_buff,"bpm %d", bpm);
 	lcd_setString(4,15,(const char*)text2_buff,LCD_FONT_8,false);
 	lcd_show();
 
@@ -185,6 +191,26 @@ void update_display(){
 void state_machine(){
 
 }
+
+void offbeat_routine(){
+	int beep_time = 50;
+	if (beat < beats_per_rythm){
+		beep_and_blink(beep_time, 1000, vol);
+		beat += 1;
+	}else{
+		beep_and_blink(beep_time, 2000, vol);
+		beat = 1;
+	}
+	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
+
+	// display value
+//	char* text3_buff[100];
+//	sprintf((char*)text3_buff,"%d %d", beat, beats_per_rythm);
+//	lcd_setString(50,4,(const char*)beat,LCD_FONT_8,false);
+//	lcd_show();
+}
+
+
 
 
 /* USER CODE END 0 */
@@ -251,8 +277,7 @@ int main(void)
 	{
 //		beep_and_blink(100, 1000, 0.01);
 
-		HAL_Delay(100);
-
+		offbeat_routine();
 
 
 	/* USER CODE END WHILE */
