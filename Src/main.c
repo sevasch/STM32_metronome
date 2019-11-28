@@ -122,11 +122,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 // timer interrupt
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
-	update_volume();
-	update_bpm();
-	update_display();
-//	beat_machine();
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	if (htim->Instance == TIM7){
+		update_volume();
+		update_bpm();
+		update_display();
+	}else if(htim->Instance == TIM6){
+//		beat_machine();
+	}
 }
 
 // other functions
