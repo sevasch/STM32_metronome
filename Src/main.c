@@ -67,12 +67,16 @@ int MAX_VOL = 100;
 char* vol_tbuff[100];
 char* bpm_tbuff[100];
 char* mode_tbuff[100];
+char* bar_tbuff[2];
+char* beat_tbuff[2];
+
 
 
 uint32_t ps;
 int beat = 1;
-int beats_per_rythm = 4;
-
+int beats_per_bar = 4;
+int MIN_BPB = 2;
+int MAX_BPB = 12;
 
 // adc
 const uint32_t ADC_MAX = 4095; // max analog value
@@ -110,12 +114,20 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 	// down
 	if (GPIO_Pin == GPIO_PIN_0) {
-		bpm -= 1;
+		if (beats_per_bar > MIN_BPB){
+			beats_per_bar -= 1;
+		}else{
+			beats_per_bar = MAX_BPB;
+		}
 	}
 
 	// up
 	if (GPIO_Pin == GPIO_PIN_4) {
-		bpm += 1;
+		if (beats_per_bar < MAX_BPB){
+			beats_per_bar += 1;
+		}else{
+			beats_per_bar = MIN_BPB;
+		}
 	}
 
 	// center
@@ -197,6 +209,7 @@ void update_display(){
 	lcd_setLine(48,0,48,31,1);
 	lcd_setLine(127,0,127,31,1);
 	lcd_setLine(0,15,127,15,1);
+	lcd_setLine(110,0,110,31,1);
 
 	// display volume
 	sprintf((char*)vol_tbuff,"vol %d", vol);
@@ -214,18 +227,26 @@ void update_display(){
 	}
 	lcd_setString(50,4,(const char*)mode_tbuff, LCD_FONT_8,false);
 
+	// display number of beats per repetition
+	sprintf((char*)bar_tbuff,"%d", beats_per_bar);
+	lcd_setString(114,4,(const char*)bar_tbuff, LCD_FONT_8,false);
+
 	// display beats
-	int min_dist = 55;
-	int max_dist = 140;
+	int min_dist = 52;
+	int max_dist = 105;
 	int pos = 0;
-	for (int b = 0; b < beats_per_rythm; ++b){
-		pos = min_dist + (float)b / (float)beats_per_rythm * (max_dist - min_dist);
-		lcd_setString(pos, 18, "o", LCD_FONT_8,false);
+	for (int b = 0; b < beats_per_bar; ++b){
+		pos = min_dist + (float)b / (float)beats_per_bar * (max_dist - min_dist);
+		lcd_setString(pos, 17, "o", LCD_FONT_8,false);
 	}
 
 	// display beat indicator
-	pos = min_dist + (float)(beat-1) / (float)beats_per_rythm * (max_dist - min_dist);
-	lcd_setString(pos, 25, "*", LCD_FONT_8,false);
+	pos = min_dist + (float)(beat-1) / (float)beats_per_bar * (max_dist - min_dist);
+	lcd_setString(pos, 24, "*", LCD_FONT_8,false);
+
+	// display beat number
+	sprintf((char*)beat_tbuff,"%d", beat);
+	lcd_setString(114,20,(const char*)beat_tbuff, LCD_FONT_8,false);
 
 	lcd_show();
 
@@ -245,7 +266,7 @@ void beat_machine(){
 
 void standard_beatroutine(){
 	int beep_time = 50;
-	if (beat < beats_per_rythm){
+	if (beat < beats_per_bar){
 		beep_and_blink(beep_time, 1000, vol);
 		beat += 1;
 	}else{
@@ -256,7 +277,7 @@ void standard_beatroutine(){
 
 void pronounced_beatroutine(){
 	int beep_time = 50;
-	if (beat < beats_per_rythm){
+	if (beat < beats_per_bar){
 		beat += 1;
 		beep_and_blink(beep_time, 1000, vol);
 	}else{
