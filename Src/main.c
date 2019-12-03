@@ -102,32 +102,35 @@ void beep_and_blink(int duration, int pitch, float volume);
 void pseudoblink(int duration, int pitch, float volume);
 void beat_machine();
 void standard_beatroutine();
-void offbeat_beatroutine();
+void pronounced_beatroutine();
 
 // buttons
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	// down: decrease Duty cycle of current LED
+	__HAL_GPIO_EXTI_CLEAR_FLAG(GPIO_Pin);
+
+	// down
 	if (GPIO_Pin == GPIO_PIN_0) {
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+		bpm -= 1;
 	}
 
-	// up: increase Duty cycle of current LED
+	// up
 	if (GPIO_Pin == GPIO_PIN_4) {
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+		bpm += 1;
 	}
+
 	// center
 	if (GPIO_Pin == GPIO_PIN_5) {
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+		if (op_mode == PRONOUNCED){
+			op_mode = STANDARD;
+		}else{
+			op_mode = PRONOUNCED;
+		}
 	}
 }
 
 // timer interrupt
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	if (htim->Instance == TIM7){
-//		beat_machine();
-	}else if(htim->Instance == TIM6){
-		beat_machine();
-	}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
+	beat_machine();
 }
 
 // other functions
@@ -156,7 +159,6 @@ void beep_and_blink(int duration, int pitch, float volume){
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 }
-
 
 void update_volume(){
 	// read analog signal
@@ -206,9 +208,9 @@ void update_display(){
 
 	// display mode
 	if (op_mode == STANDARD){
-		sprintf((char*)mode_tbuff,"STANDARD MODE");
+		sprintf((char*)mode_tbuff,"STANDARD");
 	}else if(op_mode == PRONOUNCED){
-		sprintf((char*)mode_tbuff,"PRONOUNCED MODE");
+		sprintf((char*)mode_tbuff,"PRONOUNCED");
 	}
 	lcd_setString(50,4,(const char*)mode_tbuff, LCD_FONT_8,false);
 
@@ -230,10 +232,14 @@ void update_display(){
 }
 
 void beat_machine(){
-	if (op_mode == STANDARD){
-		standard_beatroutine();
-	}else if(op_mode == PRONOUNCED){
-		offbeat_beatroutine();
+	switch (op_mode){
+		case STANDARD:
+			standard_beatroutine();
+			break;
+
+		case PRONOUNCED:
+			pronounced_beatroutine();
+			break;
 	}
 }
 
@@ -248,7 +254,7 @@ void standard_beatroutine(){
 	}
 }
 
-void offbeat_beatroutine(){
+void pronounced_beatroutine(){
 	int beep_time = 50;
 	if (beat < beats_per_rythm){
 		beat += 1;
@@ -306,12 +312,11 @@ int main(void)
 	sendData(0xA5);
 	lcd_init();
 
-
 	// start PWM and timer interrupt
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
-
 	HAL_TIM_Base_Start_IT(&htim6);
 
+	op_mode = STANDARD;
 
 	/* USER CODE END 2 */
 
@@ -322,7 +327,7 @@ int main(void)
 		update_volume();
 		update_bpm();
 		update_display();
-		HAL_Delay(50);
+		HAL_Delay(5);
 
 	/* USER CODE END WHILE */
 
