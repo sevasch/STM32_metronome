@@ -70,13 +70,15 @@ char* mode_tbuff[100];
 char* bar_tbuff[2];
 char* beat_tbuff[2];
 
-
-
 uint32_t ps;
 int beat = 1;
 int beats_per_bar = 4;
 int MIN_BPB = 2;
 int MAX_BPB = 12;
+
+uint8_t bpb_up_flag = 0;
+uint8_t bpb_down_flag = 0;
+uint8_t toggle_mode_flag = 0;
 
 // adc
 const uint32_t ADC_MAX = 4095; // max analog value
@@ -107,6 +109,7 @@ void pseudoblink(int duration, int pitch, float volume);
 void beat_machine();
 void standard_beatroutine();
 void pronounced_beatroutine();
+void button_push();
 
 // buttons
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -114,29 +117,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 	// down
 	if (GPIO_Pin == GPIO_PIN_0) {
-		if (beats_per_bar > MIN_BPB){
-			beats_per_bar -= 1;
-		}else{
-			beats_per_bar = MAX_BPB;
-		}
+		bpb_down_flag = 1;
 	}
 
 	// up
 	if (GPIO_Pin == GPIO_PIN_4) {
-		if (beats_per_bar < MAX_BPB){
-			beats_per_bar += 1;
-		}else{
-			beats_per_bar = MIN_BPB;
-		}
+		bpb_up_flag = 1;
 	}
 
 	// center
 	if (GPIO_Pin == GPIO_PIN_5) {
-		if (op_mode == PRONOUNCED){
-			op_mode = STANDARD;
-		}else{
-			op_mode = PRONOUNCED;
-		}
+		toggle_mode_flag = 1;
 	}
 }
 
@@ -286,6 +277,37 @@ void pronounced_beatroutine(){
 	}
 }
 
+void button_push(){
+	// down
+	if (bpb_down_flag == 1) {
+		if (beats_per_bar > MIN_BPB){
+			beats_per_bar -= 1;
+		}else{
+			beats_per_bar = MAX_BPB;
+		}
+		bpb_down_flag = 0;
+	}
+
+	// up
+	if (bpb_up_flag == 1) {
+		if (beats_per_bar < MAX_BPB){
+			beats_per_bar += 1;
+		}else{
+			beats_per_bar = MIN_BPB;
+		}
+		bpb_up_flag = 0;
+	}
+
+	// center
+	if (toggle_mode_flag == 1) {
+		if (op_mode == PRONOUNCED){
+			op_mode = STANDARD;
+		}else{
+			op_mode = PRONOUNCED;
+		}
+		toggle_mode_flag = 0;
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -345,6 +367,7 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
+		button_push();
 		update_volume();
 		update_bpm();
 		update_display();
