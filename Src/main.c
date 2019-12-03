@@ -183,8 +183,6 @@ void update_bpm(){
 	// calculate new prescaler
 	ps = 16000000 / (float)((float)bpm/60 * TIM6->ARR);
 
-//	f = c / (p * ps)
-
 	// adjust timer prescaler
 	TIM6->PSC = (uint32_t) ps;
 }
@@ -298,7 +296,6 @@ int main(void)
 	MX_I2C1_Init();
 	MX_TIM2_Init(100);
 	MX_TIM6_Init();
-//	MX_TIM7_Init();
 
 	/* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -314,7 +311,6 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
 
 	HAL_TIM_Base_Start_IT(&htim6);
-	HAL_TIM_Base_Start_IT(&htim7);
 
 
 	/* USER CODE END 2 */
