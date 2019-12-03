@@ -19,8 +19,6 @@
 "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o"
 "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o"
 "Src/adc.o"
-"Src/button.o"
-"Src/button_driver.o"
 "Src/gpio.o"
 "Src/i2c.o"
 "Src/lcd_driver.o"
