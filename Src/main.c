@@ -69,7 +69,7 @@ char* bpm_tbuff[100];
 char* mode_tbuff[100];
 
 
-
+uint32_t ps;
 int beat = 1;
 int beats_per_rythm = 4;
 
@@ -124,11 +124,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 // timer interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if (htim->Instance == TIM7){
-		update_volume();
-		update_bpm();
-		update_display();
-	}else if(htim->Instance == TIM6){
 //		beat_machine();
+	}else if(htim->Instance == TIM6){
+		beat_machine();
 	}
 }
 
@@ -181,6 +179,14 @@ void update_bpm(){
 
 	// update value
 	bpm = MIN_BPM + (float)pot2_raw/(float)ADC_MAX * (float)(MAX_BPM - MIN_BPM);
+
+	// calculate new prescaler
+	ps = 16000000 / (float)((float)bpm/60 * TIM6->ARR);
+
+//	f = c / (p * ps)
+
+	// adjust timer prescaler
+	TIM6->PSC = (uint32_t) ps;
 }
 
 void update_display(){
@@ -242,7 +248,6 @@ void standard_beatroutine(){
 		beep_and_blink(beep_time, 1000, vol);
 		beat = 1;
 	}
-	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
 }
 
 void offbeat_beatroutine(){
@@ -254,7 +259,6 @@ void offbeat_beatroutine(){
 		beat = 1;
 		beep_and_blink(beep_time, 2000, vol);
 	}
-	HAL_Delay((int)(1000/((float)bpm/60))-beep_time);
 }
 
 
@@ -294,7 +298,7 @@ int main(void)
 	MX_I2C1_Init();
 	MX_TIM2_Init(100);
 	MX_TIM6_Init();
-	MX_TIM7_Init();
+//	MX_TIM7_Init();
 
 	/* USER CODE BEGIN 2 */
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -319,8 +323,10 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		beat_machine();
-
+		update_volume();
+		update_bpm();
+		update_display();
+		HAL_Delay(50);
 
 	/* USER CODE END WHILE */
 
