@@ -11151,7 +11151,6 @@ int main(void)
  8004a7c:	f7ff f80e 	bl	8003a9c <MX_ADC2_Init>
 	MX_SPI1_Init();
  8004a80:	f000 f8ae 	bl	8004be0 <MX_SPI1_Init>
-//	MX_I2C1_Init();
 	MX_TIM2_Init(100);
  8004a84:	2064      	movs	r0, #100	; 0x64
  8004a86:	f000 fa01 	bl	8004e8c <MX_TIM2_Init>
@@ -11159,6 +11158,7 @@ int main(void)
  8004a8a:	f000 fa77 	bl	8004f7c <MX_TIM6_Init>
 
 	/* USER CODE BEGIN 2 */
+	// initialize LEDs
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
  8004a8e:	2201      	movs	r2, #1
  8004a90:	2110      	movs	r1, #16
@@ -11175,14 +11175,14 @@ int main(void)
  8004aa8:	4810      	ldr	r0, [pc, #64]	; (8004aec <main+0x84>)
  8004aaa:	f7fd f971 	bl	8001d90 <HAL_GPIO_WritePin>
 
-	// Initialise LCD and show "Welcome" top/left justified
+	// initialize LCD
 	sendData(0xA5);
  8004aae:	20a5      	movs	r0, #165	; 0xa5
  8004ab0:	f7ff f9f0 	bl	8003e94 <sendData>
 	lcd_init();
  8004ab4:	f7ff fa1b 	bl	8003eee <lcd_init>
 
-	// start PWM and timer interrupt
+	// start PWM timer and timer interrupt
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
  8004ab8:	2108      	movs	r1, #8
  8004aba:	480d      	ldr	r0, [pc, #52]	; (8004af0 <main+0x88>)
@@ -11191,6 +11191,7 @@ int main(void)
  8004ac0:	480c      	ldr	r0, [pc, #48]	; (8004af4 <main+0x8c>)
  8004ac2:	f7fe f894 	bl	8002bee <HAL_TIM_Base_Start_IT>
 
+	// set default operation mode
 	op_mode = STANDARD;
  8004ac6:	4b0c      	ldr	r3, [pc, #48]	; (8004af8 <main+0x90>)
  8004ac8:	2200      	movs	r2, #0

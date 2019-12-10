@@ -340,23 +340,24 @@ int main(void)
 	MX_ADC1_Init();
 	MX_ADC2_Init();
 	MX_SPI1_Init();
-//	MX_I2C1_Init();
 	MX_TIM2_Init(100);
 	MX_TIM6_Init();
 
 	/* USER CODE BEGIN 2 */
+	// initialize LEDs
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 
-	// Initialise LCD and show "Welcome" top/left justified
+	// initialize LCD
 	sendData(0xA5);
 	lcd_init();
 
-	// start PWM and timer interrupt
+	// start PWM timer and timer interrupt
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
 	HAL_TIM_Base_Start_IT(&htim6);
 
+	// set default operation mode
 	op_mode = STANDARD;
 
 	/* USER CODE END 2 */
