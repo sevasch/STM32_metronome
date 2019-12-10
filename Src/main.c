@@ -22,7 +22,6 @@
 #include "time.h"
 #include "main.h"
 #include "adc.h"
-#include "i2c.h"
 #include "spi.h"
 #include "gpio.h"
 #include "tim.h"
