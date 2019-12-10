@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000201fc  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000fea7  00000000  00000000  0002022c  2**0
+ 12 .debug_info   0000feaa  00000000  00000000  0002022c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 000024a5  00000000  00000000  000300d3  2**0
+ 13 .debug_abbrev 000024bd  00000000  00000000  000300d6  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 00000e18  00000000  00000000  00032578  2**3
+ 14 .debug_aranges 00000e18  00000000  00000000  00032598  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 00000ce0  00000000  00000000  00033390  2**3
+ 15 .debug_ranges 00000ce0  00000000  00000000  000333b0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_macro  00022e89  00000000  00000000  00034070  2**0
+ 16 .debug_macro  00022e89  00000000  00000000  00034090  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   0000c46f  00000000  00000000  00056ef9  2**0
+ 17 .debug_line   0000c46f  00000000  00000000  00056f19  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    000d3925  00000000  00000000  00063368  2**0
+ 18 .debug_str    000d3925  00000000  00000000  00063388  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  00136c8d  2**0
+ 19 .comment      0000007b  00000000  00000000  00136cad  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000043c8  00000000  00000000  00136d08  2**2
+ 20 .debug_frame  000043c8  00000000  00000000  00136d28  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -11003,7 +11003,7 @@ void button_push(){
 
 080049a4 <main>:
 /* 																			  */
-/* 	 						       MAIN LOOP								  */
+/* 	 						       	MAIN 									  */
 /* 																			  */
 /******************************************************************************/
 int main(void)

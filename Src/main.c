@@ -18,6 +18,26 @@
 
 /******************************************************************************/
 /* 																			  */
+/* 	 					 	PROGRAM DESCRIPTION								  */
+/* 																			  */
+/******************************************************************************/
+
+/* AUTHOR: 		Sebastian Schmid, Biomedical Engineering
+ * DATE: 		December 2019
+ * PURPOSE: 	This program implements a simple metronome with adjustable
+ * 				speedand volume. The number of beats per bar can be chosen and
+ * 				when in "PRONOUNCED" mode, the first beat of every bar is at a
+ * 				higher frequency.
+ *
+ * MANUAL:		potentiometer LEFT		- adjust volume
+ * 				potentiometer RIGHT		- adjust beats per minute
+ * 				button 		  CENTER	- toggle modes (STANDARD / PRONOUNCED)
+ * 				button		  UP		- increase number of beats per bar
+ * 				button 		  DOWN		- decrease number of beats per bar
+ */
+
+/******************************************************************************/
+/* 																			  */
 /* 	 						   	  INCLUDES				     				  */
 /* 														 					  */
 /******************************************************************************/
