@@ -85,10 +85,6 @@ const uint32_t ADC_MAX = 4095; // max analog value
 uint32_t pot1_raw = 0;
 uint32_t pot2_raw = 0;
 
-uint16_t LM75Address = 0x90; // I2C address of temperature sensor LM75BD
-
-uint16_t tempRegPointer = 0x00; // Address offset of temperature Register
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,6 +97,7 @@ int fputc(int ch, FILE *f) {  ITM_SendChar(ch);  return(ch); }
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// DECLARATIONS
 void update_volume();
 void update_bpm();
 void update_display();
@@ -111,7 +108,7 @@ void standard_beatroutine();
 void pronounced_beatroutine();
 void button_push();
 
-// buttons
+// EXTERNAL INTERRUPTS
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	__HAL_GPIO_EXTI_CLEAR_FLAG(GPIO_Pin);
 
@@ -131,12 +128,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-// timer interrupt
+// TIMER INTERRUPTS
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
 	beat_machine();
 }
 
-// other functions
+// METRONOME FUNCTIONS
 void beep_and_blink(int duration, int pitch, float volume){
 	// calculate prescaler
 	uint32_t clockspeed = 16000000;
@@ -172,7 +169,6 @@ void update_volume(){
 
 	// update value
 	vol = ((float)pot1_raw/(float)ADC_MAX) * (float)MAX_VOL;
-
 }
 
 void update_bpm(){
@@ -188,14 +184,14 @@ void update_bpm(){
 	// calculate new prescaler
 	ps = 16000000 / (float)((float)bpm/60 * TIM6->ARR);
 
-	// adjust timer prescaler
+	// adjust timer prescaler to change bpm
 	TIM6->PSC = (uint32_t) ps;
 }
 
 void update_display(){
 	lcd_clear();
 
-	// add some lines
+	// add some lines for nice formatting
 	lcd_setLine(0,0,0,31,1);
 	lcd_setLine(48,0,48,31,1);
 	lcd_setLine(127,0,127,31,1);
@@ -273,11 +269,13 @@ void pronounced_beatroutine(){
 		beep_and_blink(beep_time, 1000, vol);
 	}else{
 		beat = 1;
-		beep_and_blink(beep_time, 2000, vol);
+		beep_and_blink(beep_time, 2000, vol); // higher pitched beep for first beat
 	}
 }
 
 void button_push(){
+	// checks if buttons have been pushed (debouncing)
+
 	// down
 	if (bpb_down_flag == 1) {
 		if (beats_per_bar > MIN_BPB){
@@ -342,7 +340,7 @@ int main(void)
 	MX_ADC1_Init();
 	MX_ADC2_Init();
 	MX_SPI1_Init();
-	MX_I2C1_Init();
+//	MX_I2C1_Init();
 	MX_TIM2_Init(100);
 	MX_TIM6_Init();
 
