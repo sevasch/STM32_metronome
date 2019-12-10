@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -16,46 +15,38 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
 
-/* Includes ------------------------------------------------------------------*/
+/******************************************************************************/
+/* 																			  */
+/* 	 						   	  INCLUDES				     				  */
+/* 														 					  */
+/******************************************************************************/
 #include "time.h"
 #include "main.h"
 #include "adc.h"
 #include "spi.h"
 #include "gpio.h"
 #include "tim.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "lcd_driver.h"
 
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-// metronome specific
+/******************************************************************************/
+/* 																			  */
+/* 	 	    		  TYPE DEFINITIONS, DEFINES & MACROS					  */
+/* 																			  */
+/******************************************************************************/
 typedef enum {
 	STANDARD,
 	PRONOUNCED
 } mode;
+
+/******************************************************************************/
+/* 																			  */
+/* 	 						  PRIVATE VARIABLES								  */
+/* 																			  */
+/******************************************************************************/
+
+// METRONOME SETTINGS
 mode op_mode;
 
 int bpm = 50;
@@ -63,50 +54,51 @@ int MIN_BPM = 40;
 int MAX_BPM = 200;
 int vol = 0;
 int MAX_VOL = 100;
+int beat = 1;
+int beats_per_bar = 4;
+int MIN_BPB = 2;
+int MAX_BPB = 12;
+
+// BUTTON FLAGS
+uint8_t bpb_up_flag = 0;
+uint8_t bpb_down_flag = 0;
+uint8_t toggle_mode_flag = 0;
+
+// BUFFERS FOR TEXT OUTPUT
 char* vol_tbuff[100];
 char* bpm_tbuff[100];
 char* mode_tbuff[100];
 char* bar_tbuff[2];
 char* beat_tbuff[2];
 
-uint32_t ps;
-int beat = 1;
-int beats_per_bar = 4;
-int MIN_BPB = 2;
-int MAX_BPB = 12;
-
-uint8_t bpb_up_flag = 0;
-uint8_t bpb_down_flag = 0;
-uint8_t toggle_mode_flag = 0;
-
-// adc
+// ADC
 const uint32_t ADC_MAX = 4095; // max analog value
 uint32_t pot1_raw = 0;
 uint32_t pot2_raw = 0;
 
-/* USER CODE END PV */
 
-/* Private function prototypes -----------------------------------------------*/
+/******************************************************************************/
+/* 																			  */
+/* 	 						 FUNCTION PROTOTYPES							  */
+/* 																			  */
+/******************************************************************************/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
 int fputc(int ch, FILE *f) {  ITM_SendChar(ch);  return(ch); }
 
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-// DECLARATIONS
+void beep_and_blink(int duration, int pitch, float volume);
 void update_volume();
 void update_bpm();
 void update_display();
-void beep_and_blink(int duration, int pitch, float volume);
-void pseudoblink(int duration, int pitch, float volume);
 void beat_machine();
 void standard_beatroutine();
 void pronounced_beatroutine();
 void button_push();
 
+/******************************************************************************/
+/* 																			  */
+/* 	 					   FUNCTION DEFINITIONS								  */
+/* 																			  */
+/******************************************************************************/
 // EXTERNAL INTERRUPTS
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	__HAL_GPIO_EXTI_CLEAR_FLAG(GPIO_Pin);
@@ -134,7 +126,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim6){
 
 // METRONOME FUNCTIONS
 void beep_and_blink(int duration, int pitch, float volume){
-	// calculate prescaler
+	// calculate prescaler for given pitch
 	uint32_t clockspeed = 16000000;
 	uint32_t period = __HAL_TIM_GET_AUTORELOAD(&htim2);
 	uint32_t prescaler = clockspeed / (pitch * period);
@@ -143,10 +135,8 @@ void beep_and_blink(int duration, int pitch, float volume){
 	uint32_t dc = 0;
 	dc = ((float)volume/(float)MAX_VOL * 0.1) * period;
 
-	// set prescaler
-	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
-	MX_TIM2_Init(prescaler);
-	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+	// set prescaler new prescaler
+	TIM2->PSC = (uint32_t) prescaler;
 
 	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, dc);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
@@ -181,6 +171,7 @@ void update_bpm(){
 	bpm = MIN_BPM + (float)pot2_raw/(float)ADC_MAX * (float)(MAX_BPM - MIN_BPM);
 
 	// calculate new prescaler
+	uint32_t ps;
 	ps = 16000000 / (float)((float)bpm/60 * TIM6->ARR);
 
 	// adjust timer prescaler to change bpm
@@ -306,43 +297,28 @@ void button_push(){
 	}
 }
 
-/* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
+/******************************************************************************/
+/* 																			  */
+/* 	 						       	MAIN 									  */
+/* 																			  */
+/******************************************************************************/
 int main(void)
 {
-	/* USER CODE BEGIN 1 */
-	/* USER CODE END 1 */
-
-
-	/* MCU Configuration--------------------------------------------------------*/
-
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
 
-	/* USER CODE BEGIN Init */
-
-	/* USER CODE END Init */
-
 	/* Configure the system clock */
 	SystemClock_Config();
-
-	/* USER CODE BEGIN SysInit */
-
-	/* USER CODE END SysInit */
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	MX_ADC1_Init();
 	MX_ADC2_Init();
 	MX_SPI1_Init();
-	MX_TIM2_Init(100);
+	MX_TIM2_Init();
 	MX_TIM6_Init();
 
-	/* USER CODE BEGIN 2 */
 	// initialize LEDs
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
@@ -359,10 +335,7 @@ int main(void)
 	// set default operation mode
 	op_mode = STANDARD;
 
-	/* USER CODE END 2 */
-
 	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
 		button_push();
@@ -370,18 +343,14 @@ int main(void)
 		update_bpm();
 		update_display();
 		HAL_Delay(5);
-
-	/* USER CODE END WHILE */
-
-	/* USER CODE BEGIN 3 */
 	}
-  /* USER CODE END 3 */
 }
 
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+/******************************************************************************/
+/* 																			  */
+/* 	 					AUTOMATICALLY GENERATED FUNCTIONS					  */
+/* 																			  */
+/******************************************************************************/
 void SystemClock_Config(void)
 {
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -416,9 +385,6 @@ void SystemClock_Config(void)
 	}
 }
 
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 /**
   * @brief  This function is executed in case of error occurrence.
