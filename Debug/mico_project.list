@@ -11082,8 +11082,8 @@ int main(void)
  8004a0e:	f7ff fd6b 	bl	80044e8 <update_bpm>
 		update_display();
  8004a12:	f7ff fdd5 	bl	80045c0 <update_display>
-		HAL_Delay(5);
- 8004a16:	2005      	movs	r0, #5
+		HAL_Delay(50);
+ 8004a16:	2032      	movs	r0, #50	; 0x32
  8004a18:	f7fc faf8 	bl	800100c <HAL_Delay>
 		button_push();
  8004a1c:	e7f3      	b.n	8004a06 <main+0x62>

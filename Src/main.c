@@ -362,7 +362,7 @@ int main(void)
 		update_volume();
 		update_bpm();
 		update_display();
-		HAL_Delay(5);
+		HAL_Delay(50);
 	}
 }
 
